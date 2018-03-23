@@ -8,14 +8,14 @@ var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 var scheduleModelSchema = new Schema({
-	next_execution_date : Number,
-	next_execution_time : String,
-	offset_days : {
-		type:Number,
-		default: 0
-	},
-	hub_id :String,
+	execution_days : [],
+	execution_time : String,
+	device_id :String,
 	node_id: String, 
+	switch_status : {
+		type:Boolean,
+		default : true
+	},
 	created_at : 'Date',
 	updated_at : 'Date'
 });
