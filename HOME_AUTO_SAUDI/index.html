@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <title>CB AALU chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+
+  <body>
+     <Marquee><H1>CB AALU chat</H1><Img src="http://static.tumblr.com/ac6032ee925a63d4ec8cb16b03e01d8c/wvpbdks/IUWo8qjc7/tumblr_static_9b04vd4y14gsgskw4sc0koskc.png" style="width:200px;height:200px;" >
+       <Img src="https://66.media.tumblr.com/f2e68e38aa374b7f46b4b15b358ebb9b/tumblr_oh48d1XthJ1td4672o1_400.gif" style="width:200px;height:200px;">
+       <Img src="https://media.giphy.com/media/xTiQyD8jNhTUzLRcGY/giphy.gif" style="width:200px;height:200px;">
+       <Img src="http://68.media.tumblr.com/905d0cdfe70b791144fe4eb7f92d140c/tumblr_nzk2vvm5cZ1ukldkho1_400.gif" style="width:200px;height:200px;"></Marquee>
+    <ul id="messages"></ul>
+    <form action="">
+      <input id="m" autocomplete="off" /><button>Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+      $('#messages').append($('<li>').text(socket.id));
+      console.log('socket ID:' + socket.id);
+
+
+       $('form').submit(submit_function);
+       function submit_function(){
+      socket.emit('chat message', $('#m').val());
+      $('#m').val('');
+      return false;
+    }
+
+    socket.on('chat message' ,chat_message_function);
+    function chat_message_function(msg){
+      $('#messages').append($('<li>').text(msg));
+    }
+
+    </script>
+  </body>
+</html>

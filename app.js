@@ -18,13 +18,14 @@ var options = {
   server: {
     socketOptions: {
       socketTimeoutMS: 10000
-    }
+    },
+    useMongoClient: true
   }
 };
 
 var db = mongoose.connect('mongodb://127.0.0.1:27017/mqtt', options).connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.on('timeout', function () {
+db.on('timeout', function() {
   console.log('Timeout');
   process.exit(0);
 });
@@ -55,7 +56,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // will print stacktrace
 app.use(router);
 if (app.get('env') === 'development') {
-  app.use(function (err, req, res, next) {
+  app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -66,7 +67,7 @@ if (app.get('env') === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
+app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -77,21 +78,21 @@ app.use(function (err, req, res, next) {
 require('./routes')(app);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
 
-db.once('open', function () {
+db.once('open', function() {
   console.log('mongo now connected');
   http.createServer(app)
-    .on('error', function (err) {
+    .on('error', function(err) {
       util.log(err);
       process.exit(1);
     })
-    .listen(app.get('port'), function () {
+    .listen(app.get('port'), function() {
       util.log("IOT App is listening on port: " + app.get('port'));
     });
 });

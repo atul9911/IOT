@@ -1,0 +1,21 @@
+{
+  "name": "HomeAutomtion_",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "domain": "0.0.1",
+    "express": "^4.10.2",
+    "mongoose": "^4.7.7",
+    "mosca": "^2.3.0",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {
+    "flightplan": "^0.6.14"
+  },
+  "description": ""
+}
