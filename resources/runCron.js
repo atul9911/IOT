@@ -37,6 +37,47 @@ var runCron = {
 		var query = Model.find(filter);
 		query.exec(function(err, res) {
 			cb(err || res);
+
+					var nodeId = JSON.parse(packet.payload.toString().trim()).nId;
+                    var deviceId  = JSON.parse(packet.payload.toString().trim()).dId;
+                    var deviceState  = JSON.parse(packet.payload.toString().trim()).dState;
+                    var hubId  = data[0];
+                    
+                    var hub = HubController.GetHub(hubId);
+
+                    if(hub==null){
+                        console.log("hub is null");
+                        return;
+                    }
+
+                    var node =  hub.getNode(nodeId);
+
+                    if(node == null){
+                        console.log("node is null");
+                        return;
+                    }
+
+                    console.log("node type " + node.type());
+                    var node_type = node.type();
+                    console.log("device id " + deviceId);
+                    console.log("device State " + deviceState);
+
+                    if(node_type >= deviceId){
+
+                        var device = node.getDevice(deviceId);
+                        if(device==null){
+                            console.log("device is null");
+                            return;
+                        }
+                        device.setCurrentState(deviceState);
+
+                        var Hubid_ = hub.uniqueID();
+                        var deviceId_ = deviceId;
+                        var state_ = (deviceState == 'true');
+
+                        console.log("Device state" + state_);
+                        Database.setDeviceState({hubid:Hubid_,nodeId:nodeId,deviceId:deviceId_,state:state_});
+
 			//Logic will come here
 			//Rohan Please paste your logic here only 
 			//Please verify we are getting all the required input parameters

@@ -60,22 +60,16 @@ server.on('clientConnected', function(client) {
                 device.setCurrentState(devices[i].state);
                 node.addDevice(device);
             }
-
-
-
             for (var i = 0; i < irDevices.length; i++) {
                 node.addDevice(new Device(irDevices[i].id,"IR"));
             }
         }
         console.log("HUB : " );
-	for(var i=0;i<hub.Nodes.length;i++){
-                 console.log("NODE ID : " + hub.Nodes[i].id());
-        	console.log(hub.Nodes[i].Devices);
-	}
+      	for(var i=0;i<hub.Nodes.length;i++){
+                       console.log("NODE ID : " + hub.Nodes[i].id());
+              	console.log(hub.Nodes[i].Devices);
+      	}
     });
-     
-  
-
 });
 
 // fired when a message is received
