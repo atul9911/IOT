@@ -1,22 +1,9 @@
 'use strict';
 var mongoose = require('mongoose');
-
-var options = {
-  server: {
-    socketOptions: {
-      socketTimeoutMS: 10000
-    },
-    useMongoClient: true
-  }
-};
-
-var db = mongoose.connect('mongodb://127.0.0.1:27017/mqtt', options).connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.on('timeout', function() {
-  console.log('Timeout');
-  process.exit(0);
-});
-
+var async = require('async');
+var HubController = require('../HOME_AUTO_SAUDI/HubController');
+var Database = require('../HOME_AUTO_SAUDI/Database');
+var util = require('util');
 var Model = require('../models/scheduleModel');
 
 var runCron = {
@@ -31,79 +18,70 @@ var runCron = {
 		endTime.setHours(23, 59, 59, 999);
 		var filter = {
 			execution_time: hours + ':' + minutes,
-			execution_days : currentDay.toString()
+			execution_days: currentDay.toString()
 		};
 
 		var query = Model.find(filter);
 		query.exec(function(err, res) {
-			cb(err || res);
+			if (err || !res) {
+				return cb('Unable to fetch data from database');
+			}
 
-					var nodeId = JSON.parse(packet.payload.toString().trim()).nId;
-                    var deviceId  = JSON.parse(packet.payload.toString().trim()).dId;
-                    var deviceState  = JSON.parse(packet.payload.toString().trim()).dState;
-                    var hubId  = data[0];
-                    
-                    var hub = HubController.GetHub(hubId);
+			if (!res.length) {
+				return cb('No device scheduled fot this time:' + filter.execution_time);
+			}
 
-                    if(hub==null){
-                        console.log("hub is null");
-                        return;
-                    }
+			async.eachLimit(res, 5, updateDevice, finalize);
 
-                    var node =  hub.getNode(nodeId);
+			function updateDevice(device, callback) {
+				var nodeId = device.node_id;
+				var deviceId = device.device_id;
+				var deviceState = device.switch_status;
+				var hubId = device.hub_id;
 
-                    if(node == null){
-                        console.log("node is null");
-                        return;
-                    }
+				var hub = HubController.GetHub(hubId);
 
-                    console.log("node type " + node.type());
-                    var node_type = node.type();
-                    console.log("device id " + deviceId);
-                    console.log("device State " + deviceState);
-
-                    if(node_type >= deviceId){
-
-                        var device = node.getDevice(deviceId);
-                        if(device==null){
-                            console.log("device is null");
-                            return;
-                        }
-                        device.setCurrentState(deviceState);
-
-                        var Hubid_ = hub.uniqueID();
-                        var deviceId_ = deviceId;
-                        var state_ = (deviceState == 'true');
-
-                        console.log("Device state" + state_);
-                        Database.setDeviceState({hubid:Hubid_,nodeId:nodeId,deviceId:deviceId_,state:state_});
-
-			//Logic will come here
-			//Rohan Please paste your logic here only 
-			//Please verify we are getting all the required input parameters
-			/*
-				db Result for this query would like this
-				{
-					"_id" : ObjectId("5ab60e0c8c95886e3f6acfc4"),
-					"created_at" : ISODate("2018-03-24T08:36:28.256Z"),
-					"updated_at" : ISODate("2018-03-24T08:36:28.256Z"),
-					"execution_time" : "16:30",
-					"node_id" : "1",
-					"switch_status" : true,
-					"execution_days" : [
-						"1",
-						"2",
-						"3",
-						"4"
-					],
-					"__v" : 0
+				if (hub == null) {
+					return callback('No Hub found with this hub id:' + hubId);
 				}
-			*/
-			
+
+				var node = hub.getNode(nodeId);
+
+				if (node == null) {
+					return callback('No Node found with this hub id:' + nodeId);
+				}
+
+				var node_type = node.type();
+
+				if (node_type >= deviceId) {
+					var device = node.getDevice(deviceId);
+					if (device == null) {
+						return callback('No device found with device id : ' + deviceId);
+					}
+					device.setCurrentState(deviceState);
+
+					var Hubid_ = hub.uniqueID();
+					var deviceId_ = deviceId;
+					var state_ = (deviceState == 'true');
+
+					Database.setDeviceState({
+						hubid: Hubid_,
+						nodeId: nodeId,
+						deviceId: deviceId_,
+						state: state_
+					});
+				}
+			}
+
+			function finalize(err) {
+				if(err){
+					util.log(err);
+					return cb(err);
+				}
+				return cb();
+				// body...
+			}
 		});
-
-
-		// body...
 	}
 };
 

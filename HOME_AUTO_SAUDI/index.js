@@ -1,4 +1,4 @@
-var app = require('express')();
+/*var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http, {'pingInterval': 2000, 'pingTimeout': 3600000});
 var readlineSync = require('readline-sync');
@@ -1004,3 +1004,4 @@ socket.on('pong',function(data){
 
 
 
+*/

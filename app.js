@@ -13,17 +13,15 @@ var bodyParser = require('body-parser');
 var http = require('http');
 var util = require('util');
 var mongoose = require('mongoose');
+var cron = require('node-cron');
+ 
 
 var options = {
-  server: {
-    socketOptions: {
-      socketTimeoutMS: 10000
-    },
-    useMongoClient: true
-  }
+  connectTimeoutMS: 10000
 };
 
-var db = mongoose.connect('mongodb://127.0.0.1:27017/mqtt', options).connection;
+mongoose.Promise = global.Promise;
+var db = mongoose.connection.openUri('mongodb://127.0.0.1:27017/mqtt', options);
 db.on('error', console.error.bind(console, 'connection error:'));
 db.on('timeout', function() {
   console.log('Timeout');
@@ -76,6 +74,13 @@ app.use(function(err, req, res, next) {
 });
 
 require('./routes')(app);
+
+cron.schedule('* * * * *', function(){
+  util.log('Running Cron Job');
+  require('./resources/runCron').init({},function(err){
+    util.log(err);
+  });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

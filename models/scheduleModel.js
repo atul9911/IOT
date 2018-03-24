@@ -11,7 +11,8 @@ var scheduleModelSchema = new Schema({
 	execution_days : [],
 	execution_time : String,
 	device_id :String,
-	node_id: String, 
+	node_id: String,
+	hub_id: String, 
 	switch_status : {
 		type:Boolean,
 		default : true
