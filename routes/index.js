@@ -17,8 +17,8 @@ module.exports = function (app) {
 	});
 
 	app.post('/device/schedule',homeAuto.schedule);
-	app.put('/device/schedule',homeAuto.unschedule);
-	app.get('/device/schedule/:id',homeAuto.fetch);
+	app.put('/device/schedule/:id',homeAuto.unschedule);
+	app.get('/device/schedule',homeAuto.fetch);
 
 
 };
