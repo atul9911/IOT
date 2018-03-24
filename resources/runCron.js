@@ -18,7 +18,8 @@ var runCron = {
 		endTime.setHours(23, 59, 59, 999);
 		var filter = {
 			execution_time: hours + ':' + minutes,
-			execution_days: currentDay.toString()
+			execution_days: currentDay.toString(),
+			isEnabled : true
 		};
 
 		var query = Model.find(filter);

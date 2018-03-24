@@ -17,6 +17,10 @@ var scheduleModelSchema = new Schema({
 		type:Boolean,
 		default : true
 	},
+	isEnabled:{
+		type:Boolean,
+		default:true
+	},
 	created_at : 'Date',
 	updated_at : 'Date'
 });

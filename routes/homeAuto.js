@@ -3,6 +3,9 @@
 var Model = require('../models/scheduleModel');
 
 module.exports = {
+	fetch: function(req, res, next) {
+		
+	},
 	schedule: function(req, res, next) {
 		var body = req.body;
 
@@ -48,19 +51,19 @@ module.exports = {
 			switch_status: switch_status,
 			hub_id: hub_id
 		});
-		
+
 		scheduleData.save(function(err) {
 			if (err) {
 				return next(err);
-			} else{
+			} else {
 				res.json({
 					success: 'Job created succesfully'
 				});
 			}
-				
+
 		});
 	},
 	unschedule: function(req, res, next) {
-		// body...
+		
 	}
 };
