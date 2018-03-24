@@ -1,10 +1,30 @@
 'use strict';
 
 var Model = require('../models/scheduleModel');
+var validator = require('validator');
 
 module.exports = {
 	fetch: function(req, res, next) {
-		
+		var query = req.query;
+		var options = {};
+
+		Object.keys(query).forEach(function(x){
+			options[x] = query[x];
+		});
+
+		options.isEnabled = true;
+
+		var query = Model.find(options);
+		query.exec(fetchData);
+
+		function fetchData(err,response){
+			if(err || !response){
+				return next(err || new Error('Error while fetching data'));
+			}
+
+			return res.json(response);
+		}
+
 	},
 	schedule: function(req, res, next) {
 		var body = req.body;
@@ -64,6 +84,26 @@ module.exports = {
 		});
 	},
 	unschedule: function(req, res, next) {
-		
+		var id = req.params.id;
+
+		if(!id || validator.isMongoId(id)){
+			return next(new Error('Invalid Id'));
+		}		
+
+		var data = {
+			isEnabled : false
+		};
+
+		Model.update({_id:id},{$set:data}).exec(executeUpdate);
+
+		function executeUpdate(err,response){
+			if(err || !response){
+				return next(new Error('Error while updating timer'));
+			}
+
+			return res.json({
+				res:'Updated successfully'
+			});
+		}
 	}
 };
