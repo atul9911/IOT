@@ -38,6 +38,27 @@ var runCron = {
 		query.exec(function(err, res) {
 			cb(err || res);
 			//Logic will come here
+			//Rohan Please paste your logic here only 
+			//Please verify we are getting all the required input parameters
+			/*
+				db Result for this query would like this
+				{
+					"_id" : ObjectId("5ab60e0c8c95886e3f6acfc4"),
+					"created_at" : ISODate("2018-03-24T08:36:28.256Z"),
+					"updated_at" : ISODate("2018-03-24T08:36:28.256Z"),
+					"execution_time" : "16:30",
+					"node_id" : "1",
+					"switch_status" : true,
+					"execution_days" : [
+						"1",
+						"2",
+						"3",
+						"4"
+					],
+					"__v" : 0
+				}
+			*/
+			
 		});
 
 
