@@ -86,7 +86,7 @@ module.exports = {
 	unschedule: function(req, res, next) {
 		var id = req.params.id;
 
-		if(!id || validator.isMongoId(id)){
+		if(!id || !validator.isMongoId(id)){
 			return next(new Error('Invalid Id'));
 		}		
 
