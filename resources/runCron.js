@@ -7,6 +7,9 @@ var util = require('util');
 var Model = require('../models/scheduleModel');
 var NodeModel = require('../models/node');
 var Device = require('../HOME_AUTO_SAUDI/Device');
+var mqtt = require('mqtt');
+var client  = mqtt.connect('mqtt://127.0.0.1:1883');
+
 
 var runCron = {
 	init: function(options, cb) {
@@ -23,6 +26,8 @@ var runCron = {
 			execution_days: currentDay.toString(),
 			isEnabled: true
 		};
+		var mqttClient = options.mqttClient;
+
 
 		var query = Model.find(filter);
 		query.exec(function(err, res) {
@@ -105,6 +110,23 @@ var runCron = {
 						console.log("NODE ID : " + hub.Nodes[i].id());
 						console.log(hub.Nodes[i].Devices);
 					}
+
+					var publishMessage = {
+						success: true,
+						nId: nodeId,
+						dId: deviceId,
+						dState: deviceState
+					}
+
+					mqttClient.subscribe('inTopic');
+					mqttClient.publish('inTopic',publishMessage);
+
+					// var message = {
+					// 	topic: 'inTopic',
+					// 	payload: publishMessage, // or a Buffer
+					// 	qos: 0, // 0, 1, or 2
+					// 	retain: false // or true
+					// };
 
 					var Hubid_ = hub.uniqueID();
 					var deviceId_ = deviceId;

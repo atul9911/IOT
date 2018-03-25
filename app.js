@@ -14,22 +14,8 @@ var http = require('http');
 var util = require('util');
 var mongoose = require('mongoose');
 var cron = require('node-cron');
-var mosca = require('mosca');
-
-
-var ascoltatore = {
-  type: 'mongo',
-  url: 'mongodb://localhost:27017/mqtt',
-  pubsubCollection: 'ascoltatori',
-  mongo: {}
-};
-
-var settings = {
-  port: 1883,
-  backend: ascoltatore
-};
-
-var server = new mosca.Server(settings);
+var mqtt = require('mqtt');
+var client = mqtt.connect('mqtt://localhost:1883');
 
 var options = {
   connectTimeoutMS: 10000
@@ -90,13 +76,6 @@ app.use(function(err, req, res, next) {
 
 require('./routes')(app);
 
-cron.schedule('* * * * *', function() {
-  util.log('Running Cron Job');
-  require('./resources/runCron').init({}, function(err) {
-    util.log(err);
-  });
-});
-
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
@@ -107,8 +86,15 @@ app.use(function(req, res, next) {
 
 db.once('open', function() {
   console.log('mongo now connected');
-  server.on('ready', function(client) {
-    console.log('Mosca Server is Up and Running');
+  client.on('connect', function() {
+    console.log('Mqtt Client is Up and Running');
+    cron.schedule('* * * * *', function() {
+      util.log('Running Cron Job');
+      require('./resources/runCron').init({mqttClient : client}, function(err) {
+        util.log(err);
+      });
+    });
+
     http.createServer(app)
       .on('error', function(err) {
         util.log(err);
