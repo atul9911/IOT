@@ -42,7 +42,7 @@ module.exports = {
 		var time_flag = true;
 		for (var i = 0; i < execution_time.length; i++) {
 			execution_time[i] = Number(execution_time[i]);
-			if (!execution_time[i]) {
+			if (!execution_time[i] && execution_time[i] != 0) {
 				time_flag = false;
 			}
 		}
