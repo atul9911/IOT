@@ -5,6 +5,7 @@ var HubController = require('../HOME_AUTO_SAUDI/HubController');
 var Database = require('../HOME_AUTO_SAUDI/Database');
 var util = require('util');
 var Model = require('../models/scheduleModel');
+var NodeModel = require('../')
 
 var runCron = {
 	init: function(options, cb) {
@@ -40,7 +41,44 @@ var runCron = {
 				var deviceState = device.switch_status;
 				var hubId = device.hub_id;
 
-				var hub = HubController.GetHub(hubId);
+				var nodeFilter = {
+					Nodeid : nodeId,
+					Hubid : hubId,
+					{
+						devices : {
+							$elemMatch : {
+								id : deviceId
+							}
+						}
+					}
+				};
+				NodeModel.find(nodeFilter).exec(processNodeData);
+
+				function processNodeData(err,nodeData){
+					if(err || !nodeData){
+						return callback('Error while fetching data');
+
+					}
+
+					if(!nodeData.length){
+						return callback('No hub data present with the filters:' + JSON.stringify(nodeFilter));
+					}
+
+					device.setCurrentState(deviceState);
+
+					var Hubid_ = hub.uniqueID();
+					var deviceId_ = deviceId;
+					var state_ = (deviceState == 'true');
+
+					Database.setDeviceState({
+						hubid: Hubid_,
+						nodeId: nodeId,
+						deviceId: deviceId_,
+						state: state_
+					});
+				}
+
+/*				var hub = HubController.GetHub(hubId);
 
 				if (hub == null) {
 					return callback('No Hub found with this hub id:' + hubId);
@@ -71,7 +109,7 @@ var runCron = {
 						deviceId: deviceId_,
 						state: state_
 					});
-				}
+				}*/
 			}
 
 			function finalize(err) {

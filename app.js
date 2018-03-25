@@ -21,7 +21,7 @@ var options = {
 };
 
 mongoose.Promise = global.Promise;
-var db = mongoose.connection.openUri('mongodb://127.0.0.1:27017/mqtt', options);
+var db = mongoose.connection.openUri('mongodb://127.0.0.1:27017/nodes', options);
 db.on('error', console.error.bind(console, 'connection error:'));
 db.on('timeout', function() {
   console.log('Timeout');
