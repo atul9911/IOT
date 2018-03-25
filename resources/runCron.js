@@ -8,7 +8,7 @@ var Model = require('../models/scheduleModel');
 var NodeModel = require('../models/node');
 var Device = require('../HOME_AUTO_SAUDI/Device');
 var mqtt = require('mqtt');
-var client  = mqtt.connect('mqtt://127.0.0.1:1883');
+var client = mqtt.connect('mqtt://localhost:1883');
 
 
 var runCron = {
@@ -118,8 +118,25 @@ var runCron = {
 						dState: deviceState
 					}
 
-					mqttClient.subscribe('inTopic');
-					mqttClient.publish('inTopic',publishMessage);
+					client.subscribe('inTopic');
+					client.publish('inTopic', publishMessage, function(err) {
+						util.log(err || 'Message published');
+						if(err){
+							return callback('Mqtt Error');
+						}
+						
+						var Hubid_ = hub.uniqueID();
+						var deviceId_ = deviceId;
+						var state_ = (deviceState);
+
+						console.log("Device state" + state_);
+						Database.setDeviceState({
+							hubid: Hubid_,
+							nodeId: nodeId,
+							deviceId: deviceId_,
+							state: state_
+						});
+					});
 
 					// var message = {
 					// 	topic: 'inTopic',
@@ -127,18 +144,6 @@ var runCron = {
 					// 	qos: 0, // 0, 1, or 2
 					// 	retain: false // or true
 					// };
-
-					var Hubid_ = hub.uniqueID();
-					var deviceId_ = deviceId;
-					var state_ = (deviceState);
-
-					console.log("Device state" + state_);
-					Database.setDeviceState({
-						hubid: Hubid_,
-						nodeId: nodeId,
-						deviceId: deviceId_,
-						state: state_
-					});
 
 				}
 			}
