@@ -5,7 +5,7 @@ var HubController = require('../HOME_AUTO_SAUDI/HubController');
 var Database = require('../HOME_AUTO_SAUDI/Database');
 var util = require('util');
 var Model = require('../models/scheduleModel');
-var NodeModel = require('../')
+var NodeModel = require('../models/node');
 
 var runCron = {
 	init: function(options, cb) {
@@ -20,7 +20,7 @@ var runCron = {
 		var filter = {
 			execution_time: hours + ':' + minutes,
 			execution_days: currentDay.toString(),
-			isEnabled : true
+			isEnabled: true
 		};
 
 		var query = Model.find(filter);
@@ -42,25 +42,24 @@ var runCron = {
 				var hubId = device.hub_id;
 
 				var nodeFilter = {
-					Nodeid : nodeId,
-					Hubid : hubId,
-					{
-						devices : {
-							$elemMatch : {
-								id : deviceId
-							}
+					Nodeid: nodeId,
+					Hubid: hubId,
+					devices: {
+						$elemMatch: {
+							id: deviceId
 						}
 					}
+
 				};
 				NodeModel.find(nodeFilter).exec(processNodeData);
 
-				function processNodeData(err,nodeData){
-					if(err || !nodeData){
+				function processNodeData(err, nodeData) {
+					if (err || !nodeData) {
 						return callback('Error while fetching data');
 
 					}
 
-					if(!nodeData.length){
+					if (!nodeData.length) {
 						return callback('No hub data present with the filters:' + JSON.stringify(nodeFilter));
 					}
 
@@ -78,42 +77,42 @@ var runCron = {
 					});
 				}
 
-/*				var hub = HubController.GetHub(hubId);
+				/*				var hub = HubController.GetHub(hubId);
 
-				if (hub == null) {
-					return callback('No Hub found with this hub id:' + hubId);
-				}
+								if (hub == null) {
+									return callback('No Hub found with this hub id:' + hubId);
+								}
 
-				var node = hub.getNode(nodeId);
+								var node = hub.getNode(nodeId);
 
-				if (node == null) {
-					return callback('No Node found with this hub id:' + nodeId);
-				}
+								if (node == null) {
+									return callback('No Node found with this hub id:' + nodeId);
+								}
 
-				var node_type = node.type();
+								var node_type = node.type();
 
-				if (node_type >= deviceId) {
-					var device = node.getDevice(deviceId);
-					if (device == null) {
-						return callback('No device found with device id : ' + deviceId);
-					}
-					device.setCurrentState(deviceState);
+								if (node_type >= deviceId) {
+									var device = node.getDevice(deviceId);
+									if (device == null) {
+										return callback('No device found with device id : ' + deviceId);
+									}
+									device.setCurrentState(deviceState);
 
-					var Hubid_ = hub.uniqueID();
-					var deviceId_ = deviceId;
-					var state_ = (deviceState == 'true');
+									var Hubid_ = hub.uniqueID();
+									var deviceId_ = deviceId;
+									var state_ = (deviceState == 'true');
 
-					Database.setDeviceState({
-						hubid: Hubid_,
-						nodeId: nodeId,
-						deviceId: deviceId_,
-						state: state_
-					});
-				}*/
+									Database.setDeviceState({
+										hubid: Hubid_,
+										nodeId: nodeId,
+										deviceId: deviceId_,
+										state: state_
+									});
+								}*/
 			}
 
 			function finalize(err) {
-				if(err){
+				if (err) {
 					util.log(err);
 					return cb(err);
 				}
