@@ -89,9 +89,12 @@ var runCron = {
 						}
 
 						for (var i = 0; i < devices.length; i++) {
-							var device = new Device(devices[i].id, "Default");
-							device.setCurrentState(deviceState);
-							node.addDevice(device);
+							if (devices[i].id == deviceId) {
+								var device = new Device(devices[i].id, "Default");
+								device.setCurrentState(deviceState);
+								node.addDevice(device);
+							}
+
 						}
 						for (var i = 0; i < irDevices.length; i++) {
 							node.addDevice(new Device(irDevices[i].id, "IR"));
@@ -105,7 +108,7 @@ var runCron = {
 
 					var Hubid_ = hub.uniqueID();
 					var deviceId_ = deviceId;
-					var state_ = (deviceState == 'true');
+					var state_ = (deviceState);
 
 					console.log("Device state" + state_);
 					Database.setDeviceState({
