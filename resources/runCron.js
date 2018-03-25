@@ -41,7 +41,7 @@ var runCron = {
 				var deviceState = device.switch_status;
 				var hubId = device.hub_id;
 
-				var nodeFilter = {
+				/*var nodeFilter = {
 					Nodeid: nodeId,
 					Hubid: hubId,
 					devices: {
@@ -75,40 +75,40 @@ var runCron = {
 						deviceId: deviceId_,
 						state: state_
 					});
+				}*/
+
+				var hub = HubController.GetHub(hubId);
+
+				if (hub == null) {
+					return callback('No Hub found with this hub id:' + hubId);
 				}
 
-				/*				var hub = HubController.GetHub(hubId);
+				var node = hub.getNode(nodeId);
 
-								if (hub == null) {
-									return callback('No Hub found with this hub id:' + hubId);
-								}
+				if (node == null) {
+					return callback('No Node found with this hub id:' + nodeId);
+				}
 
-								var node = hub.getNode(nodeId);
+				var node_type = node.type();
 
-								if (node == null) {
-									return callback('No Node found with this hub id:' + nodeId);
-								}
+				if (node_type >= deviceId) {
+					var device = node.getDevice(deviceId);
+					if (device == null) {
+						return callback('No device found with device id : ' + deviceId);
+					}
+					device.setCurrentState(deviceState);
 
-								var node_type = node.type();
+					var Hubid_ = hub.uniqueID();
+					var deviceId_ = deviceId;
+					var state_ = (deviceState == 'true');
 
-								if (node_type >= deviceId) {
-									var device = node.getDevice(deviceId);
-									if (device == null) {
-										return callback('No device found with device id : ' + deviceId);
-									}
-									device.setCurrentState(deviceState);
-
-									var Hubid_ = hub.uniqueID();
-									var deviceId_ = deviceId;
-									var state_ = (deviceState == 'true');
-
-									Database.setDeviceState({
-										hubid: Hubid_,
-										nodeId: nodeId,
-										deviceId: deviceId_,
-										state: state_
-									});
-								}*/
+					Database.setDeviceState({
+						hubid: Hubid_,
+						nodeId: nodeId,
+						deviceId: deviceId_,
+						state: state_
+					});
+				}
 			}
 
 			function finalize(err) {

@@ -14,7 +14,22 @@ var http = require('http');
 var util = require('util');
 var mongoose = require('mongoose');
 var cron = require('node-cron');
- 
+var mosca = require('mosca');
+
+
+var ascoltatore = {
+  type: 'mongo',
+  url: 'mongodb://localhost:27017/mqtt',
+  pubsubCollection: 'ascoltatori',
+  mongo: {}
+};
+
+var settings = {
+  port: 1883,
+  backend: ascoltatore
+};
+
+var server = new mosca.Server(settings);
 
 var options = {
   connectTimeoutMS: 10000
@@ -75,9 +90,9 @@ app.use(function(err, req, res, next) {
 
 require('./routes')(app);
 
-cron.schedule('* * * * *', function(){
+cron.schedule('* * * * *', function() {
   util.log('Running Cron Job');
-  require('./resources/runCron').init({},function(err){
+  require('./resources/runCron').init({}, function(err) {
     util.log(err);
   });
 });
@@ -92,13 +107,16 @@ app.use(function(req, res, next) {
 
 db.once('open', function() {
   console.log('mongo now connected');
-  http.createServer(app)
-    .on('error', function(err) {
-      util.log(err);
-      process.exit(1);
-    })
-    .listen(app.get('port'), function() {
-      util.log("IOT App is listening on port: " + app.get('port'));
-    });
+  server.on('clientConnected', function(client) {
+    console.log('Mosca Client connected', client.id);
+    http.createServer(app)
+      .on('error', function(err) {
+        util.log(err);
+        process.exit(1);
+      })
+      .listen(app.get('port'), function() {
+        util.log("IOT App is listening on port: " + app.get('port'));
+      });
+  });
 });
 module.exports = app;
