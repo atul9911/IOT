@@ -118,10 +118,13 @@ var runCron = {
 						dState: deviceState
 					}
 
-					client.subscribe('inTopic');
-					client.publish('inTopic', JSON.stringify(publishMessage), function(err) {
+					client.subscribe('Node_change');
+					client.publish('Node_change', JSON.stringify(publishMessage), {
+						qos: 0, // 0, 1, or 2
+						retain: false // or true
+					}, function(err) {
 						util.log(err || 'Message published');
-						if(err){
+						if (err) {
 							return callback('Mqtt Error');
 						}
 
