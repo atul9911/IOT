@@ -107,8 +107,8 @@ app.use(function(req, res, next) {
 
 db.once('open', function() {
   console.log('mongo now connected');
-  server.on('clientConnected', function(client) {
-    console.log('Mosca Client connected', client.id);
+  server.on('ready', function(client) {
+    console.log('Mosca Server is Up and Running');
     http.createServer(app)
       .on('error', function(err) {
         util.log(err);

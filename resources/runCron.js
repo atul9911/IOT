@@ -41,7 +41,9 @@ var runCron = {
 				var deviceState = device.switch_status;
 				var hubId = device.hub_id;
 
-				/*var nodeFilter = {
+				var hub = HubController.AddHub(hubId, null);
+
+				var nodeFilter = {
 					Nodeid: nodeId,
 					Hubid: hubId,
 					devices: {
@@ -51,66 +53,58 @@ var runCron = {
 					}
 
 				};
+
 				NodeModel.find(nodeFilter).exec(processNodeData);
 
-				function processNodeData(err, nodeData) {
-					if (err || !nodeData) {
+				function processNodeData(err, docs) {
+					if (err || !docs) {
 						return callback('Error while fetching data');
 
 					}
 
-					if (!nodeData.length) {
+					if (!docs.length) {
 						return callback('No hub data present with the filters:' + JSON.stringify(nodeFilter));
 					}
 
-					device.setCurrentState(deviceState);
+					for (var docs_i = 0; docs_i < docs.length; docs_i++) {
 
-					var Hubid_ = hub.uniqueID();
-					var deviceId_ = deviceId;
-					var state_ = (deviceState == 'true');
+						var node_docs = docs[docs_i];
+						var nodeId = node_docs.Nodeid;
+						var hubId = node_docs.Hubid;
+						var nodeType = node_docs.Nodetype;
+						var devices = node_docs.devices;
+						var irDevices = node_docs.irDevices;
 
-					Database.setDeviceState({
-						hubid: Hubid_,
-						nodeId: nodeId,
-						deviceId: deviceId_,
-						state: state_
-					});
-				}*/
+						console.log("adding node to Hub");
+						//
+						var node = hub.addNode(nodeId, nodeType);
 
-				var hub = HubController.GetHub(hubId);
+						//CHECK
+						if (node == null) {
+							return;
+						}
+						if ((devices.length != 0) || devices != null) {
+							node.removeDevices();
+						}
 
-				if (hub == null) {
-					return callback('No Hub found with this hub id:' + hubId);
-				}
-
-				var node = hub.getNode(nodeId);
-
-				if (node == null) {
-					return callback('No Node found with this hub id:' + nodeId);
-				}
-
-				var node_type = node.type();
-
-				if (node_type >= deviceId) {
-					var device = node.getDevice(deviceId);
-					if (device == null) {
-						return callback('No device found with device id : ' + deviceId);
+						for (var i = 0; i < devices.length; i++) {
+							var device = new Device(devices[i].id, "Default");
+							device.setCurrentState(deviceState);
+							node.addDevice(device);
+						}
+						for (var i = 0; i < irDevices.length; i++) {
+							node.addDevice(new Device(irDevices[i].id, "IR"));
+						}
 					}
-					device.setCurrentState(deviceState);
-
-					var Hubid_ = hub.uniqueID();
-					var deviceId_ = deviceId;
-					var state_ = (deviceState == 'true');
-
-					Database.setDeviceState({
-						hubid: Hubid_,
-						nodeId: nodeId,
-						deviceId: deviceId_,
-						state: state_
-					});
+					console.log("HUB : ");
+					for (var i = 0; i < hub.Nodes.length; i++) {
+						console.log("NODE ID : " + hub.Nodes[i].id());
+						console.log(hub.Nodes[i].Devices);
+					}
 				}
 			}
 
+		
 			function finalize(err) {
 				if (err) {
 					util.log(err);
