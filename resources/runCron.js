@@ -118,7 +118,7 @@ var runCron = {
 						dState: deviceState
 					}
 
-					client.subscribe('Node_change');
+					//client.subscribe('Node_change');
 					client.publish('Node_change', JSON.stringify(publishMessage), {
 						qos: 0, // 0, 1, or 2
 						retain: false // or true
