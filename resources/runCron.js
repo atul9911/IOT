@@ -119,12 +119,12 @@ var runCron = {
 					}
 
 					client.subscribe('inTopic');
-					client.publish('inTopic', publishMessage, function(err) {
+					client.publish('inTopic', JSON.stringify(publishMessage), function(err) {
 						util.log(err || 'Message published');
 						if(err){
 							return callback('Mqtt Error');
 						}
-						
+
 						var Hubid_ = hub.uniqueID();
 						var deviceId_ = deviceId;
 						var state_ = (deviceState);
