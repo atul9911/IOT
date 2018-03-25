@@ -6,6 +6,7 @@ var Database = require('../HOME_AUTO_SAUDI/Database');
 var util = require('util');
 var Model = require('../models/scheduleModel');
 var NodeModel = require('../models/node');
+var Device = require('../HOME_AUTO_SAUDI/Device');
 
 var runCron = {
 	init: function(options, cb) {
@@ -101,10 +102,23 @@ var runCron = {
 						console.log("NODE ID : " + hub.Nodes[i].id());
 						console.log(hub.Nodes[i].Devices);
 					}
+
+					var Hubid_ = hub.uniqueID();
+					var deviceId_ = deviceId;
+					var state_ = (deviceState == 'true');
+
+					console.log("Device state" + state_);
+					Database.setDeviceState({
+						hubid: Hubid_,
+						nodeId: nodeId,
+						deviceId: deviceId_,
+						state: state_
+					});
+
 				}
 			}
 
-		
+
 			function finalize(err) {
 				if (err) {
 					util.log(err);
