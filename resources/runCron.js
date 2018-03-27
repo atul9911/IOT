@@ -133,12 +133,12 @@ var runCron = {
 						var state_ = (deviceState);
 
 						console.log("Device state" + state_);
-						Database.setDeviceState({
+						/*Database.setDeviceState({
 							hubid: Hubid_,
 							nodeId: nodeId,
 							deviceId: deviceId_,
 							state: state_
-						});
+						});*/
 					});
 
 					// var message = {
